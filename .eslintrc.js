@@ -1,7 +1,8 @@
 module.exports = {
   extends: 'airbnb',
   env: {
-    node: false,
+    jest: true,
+    node: true,
     browser: true,
   },
   rules: {

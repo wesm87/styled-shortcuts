@@ -1,111 +1,120 @@
-/* eslint-env jest */
+import styled from 'styled-components';
+import { is, nth, tail } from 'ramda';
 
 import withStyledShortcuts from './';
 
-const mock = (strings, ...values) => ({ strings, values });
-const styled = () => mock;
-styled.foo = 'bar';
-styled.div = mock;
-styled.div.attrs = () => mock;
-
-const wrappedStyled = withStyledShortcuts(styled);
+const styledWithShortcuts = withStyledShortcuts(styled);
 
 describe('withStyledShortcuts', () => {
-  test('is a function', () => {
-    expect(typeof withStyledShortcuts).toBe('function');
+  it('is a function', () => {
+    expect(is(Function, withStyledShortcuts)).toBe(true);
   });
-  test('that returns a function', () => {
-    const data = withStyledShortcuts(mock);
-    expect(typeof data).toBe('function');
+
+  it('returns a function', () => {
+    const result = withStyledShortcuts(styled);
+
+    expect(is(Function, result)).toBe(true);
   });
 });
 
 const testStyled = (mockStyled) => {
-  test('calling that function returns { [strings], [values] }', () => {
+  it('ignores non-string values', () => {
     const strings = ['foo'];
-    const data = mockStyled(strings, 'bar');
-    expect(data.strings).toBe(strings);
-    expect(typeof data.values).toBe('object');
-    expect(data.values instanceof Array).toBe(true);
-  });
+    const result = mockStyled(strings, 12, {}, []);
+    const interpolations = tail(result.componentStyle.rules);
 
-  test('ignore non-string values', () => {
-    const strings = ['foo'];
-    const data = mockStyled(strings, 12, {}, []);
-    data.values.forEach((value) => {
-      expect(typeof value).not.toBe('function');
+    interpolations.forEach((value) => {
+      expect(is(Function, value)).toBe(false);
     });
   });
 
-  test('[values] are all functions', () => {
+  it('converts string values to getter functions', () => {
     const strings = ['foo'];
-    const data = mockStyled(strings, 'bar', 'baz', 'boz');
-    data.values.forEach((value) => {
-      expect(typeof value).toBe('function');
+    const result = mockStyled(strings, 'bar', 'baz', 'boz');
+    const interpolations = tail(result.componentStyle.rules);
+
+    interpolations.forEach((value) => {
+      expect(is(Function, value)).toBe(true);
     });
   });
 
-  test('calling one of these functions with props, will return correct prop', () => {
+  it('returns the correct prop value for a non-dot-separated path', () => {
     const strings = ['foo'];
-    const data = mockStyled(strings, 'bar');
-    const fn = data.values[0];
-    const prop = fn({ bar: 'bar' });
-    expect(prop).toBe('bar');
+    const result = mockStyled(strings, 'bar');
+    const getter = nth(1, result.componentStyle.rules);
+    const value = getter({ bar: '15' });
+
+    expect(value).toBe('15');
   });
-  test('calling one of these functions with props, will return correct prop (w/units)', () => {
+
+  it('returns the correct prop value for a non-dot-separated path with a specified unit', () => {
     const strings = ['foo'];
-    const data = mockStyled(strings, 'bar:unit');
-    const fn = data.values[0];
-    const prop = fn({ bar: 'baz' });
-    expect(prop).toBe('bazunit');
+    const result = mockStyled(strings, 'bar:px');
+    const getter = nth(1, result.componentStyle.rules);
+    const value = getter({ bar: '20' });
+
+    expect(value).toBe('20px');
   });
-  test('calling one of these functions with dotted props, will return correct prop', () => {
+
+  it('returns the correct prop value for a dot-separated path', () => {
     const strings = ['foo'];
-    const data = mockStyled(strings, 'a.b');
-    const fn = data.values[0];
-    const prop = fn({ a: { b: 'c' } });
-    expect(prop).toBe('c');
+    const result = mockStyled(strings, 'a.b');
+    const getter = nth(1, result.componentStyle.rules);
+    const value = getter({ a: { b: '5' } });
+
+    expect(value).toBe('5');
   });
-  test('calling one of these functions with dotted props, will return correct prop (w/units)', () => {
+
+  it('returns the correct prop value for a dot-separated path with a specified unit', () => {
     const strings = ['foo'];
-    const data = mockStyled(strings, 'a.b:unit');
-    const fn = data.values[0];
-    const prop = fn({ a: { b: 'c' } });
-    expect(prop).toBe('cunit');
+    const result = mockStyled(strings, 'a.b:rem');
+    const getter = nth(1, result.componentStyle.rules);
+    const value = getter({ a: { b: 10 } });
+
+    expect(value).toBe('10rem');
   });
-  test('calling one of these functions with props, will return correct prop (num w/units)', () => {
+
+  it('does not append the specified unit if the value is `0`', () => {
     const strings = ['foo'];
-    const data = mockStyled(strings, 'bar:unit');
-    const fn = data.values[0];
-    const prop = fn({ bar: 42 });
-    expect(prop).toBe('42unit');
-  });
-  test('calling one of these functions with props, will return correct prop (0 w/units)', () => {
-    const strings = ['foo'];
-    const data = mockStyled(strings, 'bar:unit');
-    const fn = data.values[0];
-    const prop = fn({ bar: 0 });
-    expect(prop).toBe('0');
+    const result = mockStyled(strings, 'bar:px');
+    const getter = nth(1, result.componentStyle.rules);
+    const value = getter({ bar: 0 });
+
+    expect(value).toBe('0');
   });
 };
 
-describe('The new wrapped object', () => {
-  test('has the correct properties', () => {
-    expect(wrappedStyled.foo).toBe('bar');
+describe('The proxied `styled` function', () => {
+  it('works with components, ie: styledWithShortcuts(Component)', () => {
+    const Foo = () => 'foo';
+    testStyled(styledWithShortcuts(Foo));
   });
 
-  describe('Wrapping a Component ie: wrappedStyled(Component)', () => {
-    testStyled(wrappedStyled({}));
-  });
-  describe('A pre-defined HTML element ie: wrappedStyled.div', () => {
-    testStyled(wrappedStyled.div);
+  describe('has template functions for each HTML element, ie: styledWithShortcuts.div', () => {
+    testStyled(styledWithShortcuts.div);
 
-    test('has an attrs function', () => {
-      expect(typeof wrappedStyled.div).toBe('function');
+    it('has an `attrs()` function', () => {
+      expect(is(Function, styledWithShortcuts.div.attrs)).toBe(true);
     });
 
-    describe('Calling attrs() returns a function ie: wrappedStyled.div.attrs()', () => {
-      testStyled(wrappedStyled.div.attrs({}));
+    it('has an `attrs()` function that returns a template function', () => {
+      testStyled(styledWithShortcuts.div.attrs({}));
+    });
+
+    it('has an `attrs()` function that is chainable', () => {
+      testStyled(styledWithShortcuts.div.attrs({}).attrs({}));
+    });
+
+    it('has a `withConfig()` function', () => {
+      expect(is(Function, styledWithShortcuts.div.withConfig)).toBe(true);
+    });
+
+    it('has a `withConfig()` function that returns a template function', () => {
+      testStyled(styledWithShortcuts.div.withConfig({}));
+    });
+
+    it('has a `withConfig()` function that is chainable', () => {
+      testStyled(styledWithShortcuts.div.withConfig({}).withConfig({}));
     });
   });
 });
