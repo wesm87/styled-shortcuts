@@ -3,6 +3,7 @@
   "version": "2.1.2",
   "description": "A props shortcut helper for styled-components.",
   "main": "./lib/index.js",
+  "files": "lib/**/*.js",
   "scripts": {
     "prepublish": "npm run lint && npm run _build && npm run _test",
     "build": "npm run lint && npm run _build",
@@ -29,9 +30,13 @@
     "url": "https://github.com/donavon/styled-shortcuts/issues"
   },
   "homepage": "https://github.com/donavon/styled-shortcuts#readme",
+  "dependencies": {
+    "ramda": "^0.25.0",
+    "styled-transform-proxy": "^0.0.3"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
     "coveralls": "^2.13.1",
     "cowsay": "^1.1.9",
     "eslint": "^3.19.0",

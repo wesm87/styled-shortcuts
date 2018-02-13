@@ -1,3 +1,5 @@
+/* eslint-env jest */
+
 import withStyledShortcuts from './';
 
 const mock = (strings, ...values) => ({ strings, values });

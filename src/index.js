@@ -1,45 +1,10 @@
-const appendUnit = (value, unit) => (
-  value ? `${value}${unit}` : '0'
-);
+import styledTransformProxy from 'styled-transform-proxy';
 
-const getPropValue = (props, keys) => (
-  keys.split('.').reduce((obj, key) => obj[key], props)
-);
+import templateWithShortcuts from './template-with-shortcuts';
 
-const mapStringTemplateToGetter = (value) => {
-  if (typeof value === 'string') {
-    const [key, unit] = value.split(':');
-    return unit
-      ? props => appendUnit(getPropValue(props, key), unit)
-      : props => getPropValue(props, key);
-  }
-  return value;
-};
+// `styledTransformProxy` is curried so this returns a function that takes the original
+// `styled` function as its only argument and returns the new `styled` function with all
+// of its methods proxied to use the `templateWithShortcuts` transform.
+const styledWithShortcuts = styledTransformProxy(templateWithShortcuts);
 
-const withStyledShortcuts = styled => (
-  (strings, ...values) => {
-    const newValues = values.map(mapStringTemplateToGetter);
-    return styled(strings, ...newValues);
-  }
-);
-
-const withStyledShortcutsFunction = styled => (...args) => (
-  withStyledShortcuts(styled(...args))
-);
-
-const wrapStyled = (styled) => {
-  const styledShortcuts = withStyledShortcutsFunction(styled); // styled(Component)
-
-  Object.keys(styled).forEach((key) => {
-    if (typeof styled[key] === 'function' && styled[key].attrs) { // styled.div
-      styledShortcuts[key] = withStyledShortcuts(styled[key]);
-      styledShortcuts[key].attrs = withStyledShortcutsFunction(styled[key].attrs);
-    } else {
-      styledShortcuts[key] = styled[key];
-    }
-  });
-
-  return styledShortcuts;
-};
-
-export default wrapStyled;
+export default styledWithShortcuts;
