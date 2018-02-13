@@ -30,10 +30,10 @@ Here's the beauty... There's only one function!
 Styled Shortcut provides a higher order function that you use to wrap Styled Components, like this:
 
 ```js
-import rawStyled from 'styled-components';
-import shortcuts from 'styled-shortcuts';
+import styledComponents from 'styled-components';
+import styledShortcuts from 'styled-shortcuts';
 
-const styled = shortcuts(rawStyled);
+const styled = styledShortcuts(styledComponents);
 ```
 
 And to make everyone's life easier, there's now a package that does this for you.

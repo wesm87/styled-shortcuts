@@ -5,18 +5,18 @@
   "main": "./lib/index.js",
   "files": "lib/**/*.js",
   "scripts": {
-    "prepublish": "npm run lint && npm run _build && npm run _test",
-    "build": "npm run lint && npm run _build",
-    "_build": "babel src --out-dir lib --ignore '**/*.test.js'",
-    "test": "npm run lint && npm run _test",
-    "posttest": "cowsay Your tests all passed!",
+    "prepublishOnly": "yarn lint && yarn _build && yarn _test",
+    "build": "yarn lint && yarn _build",
+    "_build": "babel src --out-dir lib --ignore '**/*.test.js' --no-comments",
+    "test": "yarn lint && yarn _test",
+    "posttest": "cowsay 'Your tests all passed!'",
     "_test": "jest",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "eslint src"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/donavon/styled-shortcuts.git"
+    "url": "git+https://github.com/wesm87/styled-shortcuts.git"
   },
   "keywords": [
     "react",
