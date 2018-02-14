@@ -7,7 +7,7 @@
   "scripts": {
     "prepublishOnly": "yarn lint && yarn _build && yarn _test",
     "build": "yarn lint && yarn _build",
-    "_build": "babel src --out-dir lib --ignore '**/*.test.js' --no-comments",
+    "_build": "rm -rf lib/* && babel src --out-dir lib --ignore '**/*.test.js' --no-comments",
     "test": "yarn lint && yarn _test",
     "posttest": "cowsay 'Your tests all passed!'",
     "_test": "jest",
