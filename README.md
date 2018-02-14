@@ -1,14 +1,14 @@
 # Styled Shortcuts 💅
-[![Build Status](https://travis-ci.org/donavon/styled-shortcuts.svg?branch=master)](https://travis-ci.org/donavon/styled-shortcuts)
+[![Build Status](https://travis-ci.org/wesm87/styled-shortcuts.svg?branch=master)](https://travis-ci.org/wesm87/styled-shortcuts)
 [![npm version](https://img.shields.io/npm/v/styled-shortcuts.svg)](https://www.npmjs.com/package/styled-shortcuts)
-[![Coverage Status](https://coveralls.io/repos/github/donavon/styled-shortcuts/badge.svg?branch=master)](https://coveralls.io/github/donavon/styled-shortcuts?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/wesm87/styled-shortcuts/badge.svg?branch=master)](https://coveralls.io/github/wesm87/styled-shortcuts?branch=master)
 
 TL;DR
 
 * Now with **Theme Support**!
 * Provides convenient props shortcut helper for
 [Styled Components](https://www.npmjs.com/package/styled-components) 💅
-* Small footprint with **No Dependencies**!
+* Small footprint
 * With Styled Shortcuts you can now do this:
   ```js
   font-size: ${'fontSize:px'};

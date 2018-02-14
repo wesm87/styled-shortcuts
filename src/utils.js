@@ -1,3 +1,5 @@
+// @flow
+
 import {
   __,
   curry,
@@ -12,16 +14,25 @@ import {
   unless,
 } from 'ramda';
 
+/**
+ * Gets a prop value using a dot-separated path composed of any combination of prop names
+ * and/or array indices.
+ *
+ * @signature String -> Object -> *
+ */
 export const dotPath = useWith(path, [split('.'), identity]);
 
-export const appendUnit = curry((unit, value) =>
+/**
+ * Appends a unit to a numeric value if the value is not 0.
+ */
+export const appendUnit = curry((unit: string, value: number | string): string =>
   pipe(
     Number,
     defaultTo(0),
     String,
     unless(
       equals('0'),
-      concat(__, unit)
+      concat(__, unit),
     ),
   )(value)
 );
